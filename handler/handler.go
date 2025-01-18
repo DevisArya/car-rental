@@ -5,4 +5,5 @@ type AppHandler struct {
 	CarHandler
 	BookingHandler
 	MembershipHandler
+	DriverHandler
 }

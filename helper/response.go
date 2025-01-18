@@ -82,3 +82,23 @@ func ToMembershipResponses(memberships *[]models.Membership) *[]dto.MembershipRe
 	}
 	return &membershipResponses
 }
+
+func ToDriverResponse(driver *models.Driver) *dto.DriverResponse {
+	return &dto.DriverResponse{
+		DriverID:    driver.DriverID,
+		Name:        driver.Name,
+		Nik:         driver.Nik,
+		PhoneNumber: driver.PhoneNumber,
+		DailyCost:   driver.DailyCost,
+	}
+}
+
+func ToDriverResponses(drivers *[]models.Driver) *[]dto.DriverResponse {
+
+	var driverResponses []dto.DriverResponse
+
+	for _, val := range *drivers {
+		driverResponses = append(driverResponses, *ToDriverResponse(&val))
+	}
+	return &driverResponses
+}

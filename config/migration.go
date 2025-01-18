@@ -13,6 +13,7 @@ func InitialMigration(db *gorm.DB) {
 		models.Car{},
 		models.Booking{},
 		models.Membership{},
+		models.Driver{},
 	)
 
 	helper.PanicIfError(err)
