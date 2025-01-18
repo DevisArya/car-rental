@@ -26,10 +26,15 @@ func NewAppContainer(db *gorm.DB, validate *validator.Validate) *handler.AppHand
 	membershipService := service.NewMembershipService(membershipRepository, db, validate)
 	membershipHandler := handler.NewMembershipHandler(membershipService)
 
+	driverRepository := repository.NewDriverRepository()
+	driverService := service.NewDriverService(driverRepository, db, validate)
+	driverHandler := handler.NewDriverHandler(driverService)
+
 	return &handler.AppHandler{
 		CustomerHandler:   customerHandler,
 		CarHandler:        carHandler,
 		BookingHandler:    bookingHandler,
 		MembershipHandler: membershipHandler,
+		DriverHandler:     driverHandler,
 	}
 }
