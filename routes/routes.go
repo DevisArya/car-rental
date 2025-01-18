@@ -10,4 +10,5 @@ func NewRouter(e *echo.Echo, AppHandler *handler.AppHandler) {
 	// Regist All Routes
 	RegisterCustomerRoutes(e, AppHandler.CustomerHandler)
 	RegisterCarRoutes(e, AppHandler.CarHandler)
+	RegisterBookingRoutes(e, AppHandler.BookingHandler)
 }

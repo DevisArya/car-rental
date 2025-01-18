@@ -5,6 +5,7 @@ import (
 
 	"github.com/DevisArya/car-rental/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CarRepositoryImpl struct {
@@ -90,4 +91,18 @@ func (*CarRepositoryImpl) FindAll(ctx context.Context, db *gorm.DB, limit int, o
 	}
 
 	return &cars, totalCount, nil
+}
+
+func (*CarRepositoryImpl) SelectForUpdateCarStock(ctx context.Context, tx *gorm.DB, carId uint, stockChange int) error {
+
+	if err := tx.WithContext(ctx).
+		Model(&models.Car{}).
+		Where("car_id = ?", carId).
+		Clauses(clause.Locking{Strength: clause.LockingStrengthUpdate}).
+		Updates(map[string]interface{}{"stock": gorm.Expr("stock + ?", stockChange)}).
+		Error; err != nil {
+		return err
+	}
+
+	return nil
 }

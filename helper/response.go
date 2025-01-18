@@ -42,3 +42,25 @@ func ToCarResponses(cars *[]models.Car) *[]dto.CarResponse {
 	}
 	return &carResponses
 }
+
+func ToBookingResponse(booking *models.Booking) *dto.BookingResponse {
+	return &dto.BookingResponse{
+		BookingID:  booking.BookingID,
+		CustomerID: booking.CustomerID,
+		CarID:      booking.CarID,
+		StartDate:  booking.StartDate,
+		EndDate:    booking.EndDate,
+		TotalCost:  booking.TotalCost,
+		Finished:   booking.Finished,
+	}
+}
+
+func ToBookingResponses(bookings *[]models.Booking) *[]dto.BookingResponse {
+
+	var bookingResponses []dto.BookingResponse
+
+	for _, val := range *bookings {
+		bookingResponses = append(bookingResponses, *ToBookingResponse(&val))
+	}
+	return &bookingResponses
+}

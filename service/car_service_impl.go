@@ -150,3 +150,13 @@ func (service *CarServiceImpl) Delete(ctx context.Context, carId uint) error {
 
 	return nil
 }
+
+func (service *CarServiceImpl) SelectForUpdateCarStock(ctx context.Context, tx *gorm.DB, id uint, stockChange int) error {
+
+	err := service.CarRepository.SelectForUpdateCarStock(ctx, tx, id, stockChange)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
