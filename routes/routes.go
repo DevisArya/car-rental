@@ -11,4 +11,5 @@ func NewRouter(e *echo.Echo, AppHandler *handler.AppHandler) {
 	RegisterCustomerRoutes(e, AppHandler.CustomerHandler)
 	RegisterCarRoutes(e, AppHandler.CarHandler)
 	RegisterBookingRoutes(e, AppHandler.BookingHandler)
+	RegisterMembershipRoutes(e, AppHandler.MembershipHandler)
 }
