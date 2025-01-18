@@ -14,7 +14,12 @@ func NewAppContainer(db *gorm.DB, validate *validator.Validate) *handler.AppHand
 	customerService := service.NewCustomerService(customerRepository, db, validate)
 	customerHandler := handler.NewCustomerHandler(customerService)
 
+	carRepository := repository.NewCarRepository()
+	carService := service.NewCarService(carRepository, db, validate)
+	carHandler := handler.NewCarHandler(carService)
+
 	return &handler.AppHandler{
 		CustomerHandler: customerHandler,
+		CarHandler:      carHandler,
 	}
 }
