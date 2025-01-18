@@ -64,3 +64,21 @@ func ToBookingResponses(bookings *[]models.Booking) *[]dto.BookingResponse {
 	}
 	return &bookingResponses
 }
+
+func ToMembershipResponse(membership *models.Membership) *dto.MembershipResponse {
+	return &dto.MembershipResponse{
+		MembershipID:   membership.MembershipID,
+		MembershipName: membership.MembershipName,
+		Discount:       membership.Discount,
+	}
+}
+
+func ToMembershipResponses(memberships *[]models.Membership) *[]dto.MembershipResponse {
+
+	var membershipResponses []dto.MembershipResponse
+
+	for _, val := range *memberships {
+		membershipResponses = append(membershipResponses, *ToMembershipResponse(&val))
+	}
+	return &membershipResponses
+}

@@ -4,4 +4,5 @@ type AppHandler struct {
 	CustomerHandler
 	CarHandler
 	BookingHandler
+	MembershipHandler
 }

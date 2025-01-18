@@ -8,11 +8,11 @@ import (
 func RegisterCarRoutes(e *echo.Echo, carHandler handler.CarHandler) {
 
 	// route for car
-	v1 := e.Group("/v1")
+	v2 := e.Group("/v2")
 
-	v1.POST("/car", carHandler.Create)
-	v1.PATCH("/car/:id", carHandler.Update)
-	v1.DELETE("/car/:id", carHandler.Delete)
-	v1.GET("/car/:id", carHandler.FindById)
-	v1.GET("/cars", carHandler.FindAll)
+	v2.POST("/car", carHandler.Create)
+	v2.PATCH("/car/:id", carHandler.Update)
+	v2.DELETE("/car/:id", carHandler.Delete)
+	v2.GET("/car/:id", carHandler.FindById)
+	v2.GET("/cars", carHandler.FindAll)
 }

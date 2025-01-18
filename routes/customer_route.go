@@ -8,11 +8,11 @@ import (
 func RegisterCustomerRoutes(e *echo.Echo, customerHandler handler.CustomerHandler) {
 
 	// route for customer
-	v1 := e.Group("/v1")
+	v2 := e.Group("/v2")
 
-	v1.POST("/customer", customerHandler.Create)
-	v1.PATCH("/customer/:id", customerHandler.Update)
-	v1.DELETE("/customer/:id", customerHandler.Delete)
-	v1.GET("/customer/:id", customerHandler.FindById)
-	v1.GET("/customers", customerHandler.FindAll)
+	v2.POST("/customer", customerHandler.Create)
+	v2.PATCH("/customer/:id", customerHandler.Update)
+	v2.DELETE("/customer/:id", customerHandler.Delete)
+	v2.GET("/customer/:id", customerHandler.FindById)
+	v2.GET("/customers", customerHandler.FindAll)
 }

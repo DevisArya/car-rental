@@ -8,12 +8,12 @@ import (
 func RegisterBookingRoutes(e *echo.Echo, bookingHandler handler.BookingHandler) {
 
 	// route for booking
-	v1 := e.Group("/v1")
+	v2 := e.Group("/v2")
 
-	v1.POST("/booking", bookingHandler.Create)
-	v1.PATCH("/booking/:id", bookingHandler.Update)
-	v1.PATCH("/booking/status/:id", bookingHandler.UpdateStatus)
-	v1.DELETE("/booking/:id", bookingHandler.Delete)
-	v1.GET("/booking/:id", bookingHandler.FindById)
-	v1.GET("/bookings", bookingHandler.FindAll)
+	v2.POST("/booking", bookingHandler.Create)
+	v2.PATCH("/booking/:id", bookingHandler.Update)
+	v2.PATCH("/booking/status/:id", bookingHandler.UpdateStatus)
+	v2.DELETE("/booking/:id", bookingHandler.Delete)
+	v2.GET("/booking/:id", bookingHandler.FindById)
+	v2.GET("/bookings", bookingHandler.FindAll)
 }
