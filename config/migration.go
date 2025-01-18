@@ -11,6 +11,7 @@ func InitialMigration(db *gorm.DB) {
 	err := db.AutoMigrate(
 		models.Customer{},
 		models.Car{},
+		models.Booking{},
 	)
 
 	helper.PanicIfError(err)
