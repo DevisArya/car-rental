@@ -20,14 +20,16 @@ func main() {
 
 	db := config.NewDB()
 	config.InitialMigration(db)
+	config.SeedBookingTypes(db)
+
 	validate := validator.New()
+
 	e := echo.New()
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}, latency=${latency_human}\n",
 	}))
 
 	appContainer := app.NewAppContainer(db, validate)
-
 	routes.NewRouter(e, appContainer)
 
 	if err := e.Start(os.Getenv("PORT")); err != nil {

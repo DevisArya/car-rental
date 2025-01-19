@@ -57,6 +57,7 @@ func (*CustomerRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, custom
 	var customer models.Customer
 
 	if err := db.WithContext(ctx).
+		Preload("Membership").
 		First(&customer, customerId).
 		Error; err != nil {
 		return nil, err
@@ -78,6 +79,7 @@ func (*CustomerRepositoryImpl) FindAll(ctx context.Context, db *gorm.DB, limit i
 	}
 
 	if err := db.WithContext(ctx).
+		Preload("Membership").
 		Limit(limit).
 		Offset(offset).
 		Find(&customers).

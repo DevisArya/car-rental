@@ -9,18 +9,9 @@ import (
 )
 
 func NewAppContainer(db *gorm.DB, validate *validator.Validate) *handler.AppHandler {
-
-	customerRepository := repository.NewCustomerRepository()
-	customerService := service.NewCustomerService(customerRepository, db, validate)
-	customerHandler := handler.NewCustomerHandler(customerService)
-
 	carRepository := repository.NewCarRepository()
 	carService := service.NewCarService(carRepository, db, validate)
 	carHandler := handler.NewCarHandler(carService)
-
-	bookingRepository := repository.NewBookingRepository()
-	bookingService := service.NewBookingService(bookingRepository, carService, db, validate)
-	bookingHandler := handler.NewBookingHandler(bookingService)
 
 	membershipRepository := repository.NewMembershipRepository()
 	membershipService := service.NewMembershipService(membershipRepository, db, validate)
@@ -29,6 +20,14 @@ func NewAppContainer(db *gorm.DB, validate *validator.Validate) *handler.AppHand
 	driverRepository := repository.NewDriverRepository()
 	driverService := service.NewDriverService(driverRepository, db, validate)
 	driverHandler := handler.NewDriverHandler(driverService)
+
+	customerRepository := repository.NewCustomerRepository()
+	customerService := service.NewCustomerService(customerRepository, membershipService, db, validate)
+	customerHandler := handler.NewCustomerHandler(customerService)
+
+	bookingRepository := repository.NewBookingRepository()
+	bookingService := service.NewBookingService(bookingRepository, carService, customerService, driverService, db, validate)
+	bookingHandler := handler.NewBookingHandler(bookingService)
 
 	return &handler.AppHandler{
 		CustomerHandler:   customerHandler,

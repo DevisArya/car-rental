@@ -9,11 +9,13 @@ import (
 func InitialMigration(db *gorm.DB) {
 
 	err := db.AutoMigrate(
-		models.Customer{},
-		models.Car{},
 		models.Booking{},
+		models.BookingType{},
+		models.Customer{},
 		models.Membership{},
+		models.Car{},
 		models.Driver{},
+		models.DriverIncentive{},
 	)
 
 	helper.PanicIfError(err)

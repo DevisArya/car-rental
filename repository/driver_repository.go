@@ -14,4 +14,5 @@ type DriverRepository interface {
 	FindById(ctx context.Context, db *gorm.DB, driverId uint) (*models.Driver, error)
 	FindByNikAndPhoneNumber(ctx context.Context, db *gorm.DB, PhoneNumber string, Nik string) (bool, error)
 	FindAll(ctx context.Context, db *gorm.DB, limit int, offset int) (*[]models.Driver, int64, error)
+	// FindDriverIncentive(ctx context.Context, db *gorm.DB, driverId uint, date *dto.FindDriverIncentiveRequest) (*models.Driver, error)
 }

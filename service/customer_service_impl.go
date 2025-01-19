@@ -17,14 +17,20 @@ import (
 
 type CustomerServiceImpl struct {
 	CustomerRepository repository.CustomerRepository
+	MembershipService  MembershipService
 	DB                 *gorm.DB
 	validate           *validator.Validate
 }
 
-func NewCustomerService(customerRepository repository.CustomerRepository, DB *gorm.DB, validate *validator.Validate) CustomerService {
+func NewCustomerService(
+	customerRepository repository.CustomerRepository,
+	membershipService MembershipService,
+	DB *gorm.DB,
+	validate *validator.Validate) CustomerService {
 
 	return &CustomerServiceImpl{
 		CustomerRepository: customerRepository,
+		MembershipService:  membershipService,
 		DB:                 DB,
 		validate:           validate,
 	}
@@ -44,15 +50,24 @@ func (service *CustomerServiceImpl) Create(ctx context.Context, request *dto.Cus
 		return nil, helper.NewValidationError(http.StatusBadRequest, validationMessages)
 	}
 
+	//cek apakah id membership ada
+	if request.MembershipID != nil {
+		_, err := service.MembershipService.FindById(ctx, *request.MembershipID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	//melakukan database transaksional
 	tx := service.DB.Begin()
 	defer helper.CommitOrRollback(tx)
 
 	//menyiapkan data untuk disimpan
 	custData := models.Customer{
-		Name:        request.Name,
-		Nik:         request.Nik,
-		PhoneNumber: request.PhoneNumber,
+		Name:         request.Name,
+		Nik:          request.Nik,
+		PhoneNumber:  request.PhoneNumber,
+		MembershipID: request.MembershipID,
 	}
 
 	noRecord, err := service.CustomerRepository.FindByNikAndPhoneNumber(ctx, tx, custData.PhoneNumber, custData.Nik)
@@ -91,10 +106,11 @@ func (service *CustomerServiceImpl) Update(ctx context.Context, request *dto.Cus
 
 	//menyiapkan data untuk update
 	custData := models.Customer{
-		CustomerID:  customerId,
-		Name:        request.Name,
-		Nik:         request.Nik,
-		PhoneNumber: request.PhoneNumber,
+		CustomerID:   customerId,
+		Name:         request.Name,
+		Nik:          request.Nik,
+		PhoneNumber:  request.PhoneNumber,
+		MembershipID: request.MembershipID,
 	}
 
 	// cek apakah customer dengan id ini ada

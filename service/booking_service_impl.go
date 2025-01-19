@@ -18,6 +18,8 @@ import (
 type BookingServiceImpl struct {
 	BookingRepository repository.BookingRepository
 	CarService        CarService
+	CustomerService   CustomerService
+	DriverService     DriverService
 	DB                *gorm.DB
 	validate          *validator.Validate
 }
@@ -25,6 +27,8 @@ type BookingServiceImpl struct {
 func NewBookingService(
 	bookingRepository repository.BookingRepository,
 	carService CarService,
+	customerService CustomerService,
+	driverService DriverService,
 	DB *gorm.DB,
 	validate *validator.Validate) BookingService {
 
@@ -53,6 +57,13 @@ func (service *BookingServiceImpl) Create(ctx context.Context, request *dto.Book
 	if request.EndDate.Before(request.StartDate) {
 		return nil, helper.NewValidationError(http.StatusBadRequest, []string{"end date cannot be earlier than the start date"})
 	}
+
+	//cek customer
+	customer, err := service.CustomerService.FindById(ctx, uint(request.CustomerID))
+	if err != nil {
+		return nil, err
+	}
+
 	//melakukan database transaksional
 	tx := service.DB.Begin()
 	defer helper.CommitOrRollback(tx)
@@ -71,12 +82,34 @@ func (service *BookingServiceImpl) Create(ctx context.Context, request *dto.Book
 
 	//menyiapkan data untuk disimpan
 	custData := models.Booking{
-		CustomerID: request.CustomerID,
-		CarID:      request.CarID,
-		StartDate:  request.StartDate,
-		EndDate:    request.EndDate,
-		Finished:   false,
-		TotalCost:  totalCost,
+		CustomerID:    request.CustomerID,
+		CarID:         request.CarID,
+		StartDate:     request.StartDate,
+		EndDate:       request.EndDate,
+		Finished:      false,
+		TotalCost:     totalCost,
+		DriverID:      request.DriverID,
+		BookingTypeID: request.BookingTypeID,
+	}
+
+	//jika mempunyai member hitung diskon
+	if customer.MembershipID != nil {
+		custData.Discount = int(totalCost) * customer.Membership.Discount
+	}
+
+	//jika booking dengan driver maka hitung driver cost
+	if request.BookingTypeID == 2 {
+		//cek driver
+		driver, err := service.DriverService.FindById(ctx, *request.DriverID)
+		if err != nil {
+			return nil, err
+		}
+
+		custData.TotalDriverCost = days * driver.DailyCost
+
+		custData.DriverIncentive = models.DriverIncentive{
+			Incentive: uint(float64(totalCost) * 0.05),
+		}
 	}
 
 	booking, err := service.BookingRepository.Create(ctx, tx, &custData)
