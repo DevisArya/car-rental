@@ -108,25 +108,49 @@ func (service *CustomerServiceImpl) Update(ctx context.Context, request *dto.Cus
 	custData := models.Customer{
 		CustomerID:   customerId,
 		Name:         request.Name,
-		Nik:          request.Nik,
 		PhoneNumber:  request.PhoneNumber,
 		MembershipID: request.MembershipID,
 	}
 
 	// cek apakah customer dengan id ini ada
-	_, err := service.CustomerRepository.FindById(ctx, tx, custData.CustomerID)
+	customer, err := service.CustomerRepository.FindById(ctx, tx, custData.CustomerID)
 	if err != nil {
 		return err
 	}
 
-	//cek apakah data nik dan nomor hp sudah ada
-	noRecord, err := service.CustomerRepository.FindByNikAndPhoneNumber(ctx, tx, custData.PhoneNumber, custData.Nik)
-	if err != nil {
-		return err
+	//jika nik tidak sama dengan sebelumnya
+	if customer.Nik != request.Nik {
+
+		custData.Nik = request.Nik
+
+		//cek apakah tidak ada nik
+		noRecord, err := service.CustomerRepository.FindByNik(ctx, tx, request.Nik)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(noRecord)
+
+		//jika ada
+		if !noRecord {
+			return helper.NewValidationError(http.StatusBadRequest, []string{"nik already used"})
+		}
 	}
 
-	if !noRecord {
-		return helper.NewValidationError(http.StatusBadRequest, []string{"nik or phone number already used"})
+	//jika nomor hp tidak sama dengan sebelumnya
+	if customer.PhoneNumber != request.PhoneNumber {
+		custData.PhoneNumber = request.PhoneNumber
+
+		//cek apakah tidak ada nomor hp
+		noRecord, err := service.CustomerRepository.FindByPhoneNumber(ctx, tx, request.PhoneNumber)
+		if err != nil {
+			return err
+		}
+
+		//jika ada
+		if !noRecord {
+			return helper.NewValidationError(http.StatusBadRequest, []string{"phone number already used"})
+		}
 	}
 
 	if err := service.CustomerRepository.Update(ctx, tx, &custData); err != nil {

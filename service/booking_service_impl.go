@@ -35,6 +35,8 @@ func NewBookingService(
 	return &BookingServiceImpl{
 		BookingRepository: bookingRepository,
 		CarService:        carService,
+		CustomerService:   customerService,
+		DriverService:     driverService,
 		DB:                DB,
 		validate:          validate,
 	}
@@ -74,6 +76,10 @@ func (service *BookingServiceImpl) Create(ctx context.Context, request *dto.Book
 		return nil, err
 	}
 
+	if car.Stock == 0 {
+		return nil, helper.NewValidationError(http.StatusBadRequest, []string{"empty stock"})
+	}
+
 	//hitung biaya sewa perhari * jumlah hari
 	difference := request.EndDate.Sub(request.StartDate)
 	days := int(difference.Hours()/24) + 1
@@ -94,21 +100,32 @@ func (service *BookingServiceImpl) Create(ctx context.Context, request *dto.Book
 
 	//jika mempunyai member hitung diskon
 	if customer.MembershipID != nil {
-		custData.Discount = int(totalCost) * customer.Membership.Discount
+		custData.Discount = (int(totalCost) * customer.Membership.Discount) / 100
 	}
 
 	//jika booking dengan driver maka hitung driver cost
 	if request.BookingTypeID == 2 {
 		//cek driver
-		driver, err := service.DriverService.FindById(ctx, *request.DriverID)
-		if err != nil {
-			return nil, err
+
+		if request.DriverID != nil {
+			driver, err := service.DriverService.FindById(ctx, *request.DriverID)
+			if err != nil {
+				return nil, err
+			}
+
+			custData.TotalDriverCost = days * driver.DailyCost
+
+			custData.DriverIncentive = models.DriverIncentive{
+				Incentive: uint(float64(totalCost) * 0.05),
+			}
+		} else {
+			return nil, helper.NewValidationError(http.StatusBadRequest, []string{"If Booking Type 2 driver ID cant null"})
 		}
 
-		custData.TotalDriverCost = days * driver.DailyCost
-
-		custData.DriverIncentive = models.DriverIncentive{
-			Incentive: uint(float64(totalCost) * 0.05),
+	} else {
+		//jika booking type 1 maka driver id harus kosong / nill
+		if request.DriverID != nil {
+			return nil, helper.NewValidationError(http.StatusBadRequest, []string{"If Booking Type 1 driver ID should be null"})
 		}
 	}
 
@@ -141,20 +158,29 @@ func (service *BookingServiceImpl) Update(ctx context.Context, request *dto.Book
 	if request.EndDate.Before(request.StartDate) {
 		return helper.NewValidationError(http.StatusBadRequest, []string{"end date cannot be earlier than the start date"})
 	}
+
+	//cek customer
+	customer, err := service.CustomerService.FindById(ctx, uint(request.CustomerID))
+	if err != nil {
+		return err
+	}
+
 	//melakukan database transaksional
 	tx := service.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-
 	// cek apakah booking dengan id ini apakah ada
 	booking, err := service.BookingRepository.FindById(ctx, tx, uint(bookingId))
 	if err != nil {
 		return err
 	}
-
 	//ambil harga sewa perhari
 	car, err := service.CarService.FindById(ctx, uint(request.CarID))
 	if err != nil {
 		return err
+	}
+
+	if car.Stock == 0 {
+		return helper.NewValidationError(http.StatusBadRequest, []string{"empty stock"})
 	}
 
 	//hitung biaya sewa perhari * jumlah hari
@@ -165,12 +191,45 @@ func (service *BookingServiceImpl) Update(ctx context.Context, request *dto.Book
 
 	//menyiapkan data untuk disimpan
 	custData := models.Booking{
-		BookingID:  uint64(bookingId),
-		CustomerID: request.CustomerID,
-		CarID:      request.CarID,
-		StartDate:  request.StartDate,
-		EndDate:    request.EndDate,
-		TotalCost:  totalCost,
+		BookingID:     uint64(bookingId),
+		CustomerID:    request.CustomerID,
+		CarID:         request.CarID,
+		StartDate:     request.StartDate,
+		EndDate:       request.EndDate,
+		TotalCost:     totalCost,
+		DriverID:      request.DriverID,
+		BookingTypeID: request.BookingTypeID,
+	}
+
+	//jika mempunyai member hitung diskon
+	if customer.MembershipID != nil {
+		custData.Discount = (int(totalCost) * customer.Membership.Discount) / 100
+	}
+
+	//jika booking dengan driver maka hitung driver cost
+	if request.BookingTypeID == 2 {
+		//cek driver
+
+		if request.DriverID != nil {
+			driver, err := service.DriverService.FindById(ctx, *request.DriverID)
+			if err != nil {
+				return err
+			}
+
+			custData.TotalDriverCost = days * driver.DailyCost
+
+			custData.DriverIncentive = models.DriverIncentive{
+				Incentive: uint(float64(totalCost) * 0.05),
+			}
+		} else {
+			return helper.NewValidationError(http.StatusBadRequest, []string{"If Booking Type 2 driver ID cant null"})
+		}
+
+	} else {
+		//jika booking type 1 maka driver id harus kosong / nill
+		if request.DriverID != nil {
+			return helper.NewValidationError(http.StatusBadRequest, []string{"If Booking Type 1 driver ID should be null"})
+		}
 	}
 
 	if err := service.BookingRepository.Update(ctx, tx, &custData); err != nil {

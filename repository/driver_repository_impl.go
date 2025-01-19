@@ -110,16 +110,35 @@ func (*DriverRepositoryImpl) FindByNikAndPhoneNumber(ctx context.Context, db *go
 	return false, nil
 }
 
-// // FindById implements DriverRepository
-// func (*DriverRepositoryImpl) FindDriverIncentive(ctx context.Context, db *gorm.DB, driverId uint, date *dto.FindDriverIncentiveRequest) (*models.Driver, error) {
-// 	var driver models.Driver
+func (*DriverRepositoryImpl) FindByPhoneNumber(ctx context.Context, db *gorm.DB, PhoneNumber string) (bool, error) {
+	var driver models.Driver
 
-// 	if err := db.WithContext(ctx).
-// 		Preload("Bookings", "start_date BETWEEN ? AND ?", date.StartDate, date.EndDate).
-// 		First(&driver, driverId).
-// 		Error; err != nil {
-// 		return nil, err
-// 	}
+	err := db.WithContext(ctx).
+		Where("phone_number = ?", PhoneNumber).
+		First(&driver).Error
 
-// 	return &driver, nil
-// }
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return true, nil
+		}
+		return false, err
+	}
+
+	return false, nil
+}
+func (*DriverRepositoryImpl) FindByNik(ctx context.Context, db *gorm.DB, Nik string) (bool, error) {
+	var driver models.Driver
+
+	err := db.WithContext(ctx).
+		Where("nik = ?", Nik).
+		First(&driver).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return true, nil
+		}
+		return false, err
+	}
+
+	return false, nil
+}

@@ -47,13 +47,17 @@ func ToCarResponses(cars *[]models.Car) *[]dto.CarResponse {
 
 func ToBookingResponse(booking *models.Booking) *dto.BookingResponse {
 	return &dto.BookingResponse{
-		BookingID:  booking.BookingID,
-		CustomerID: booking.CustomerID,
-		CarID:      booking.CarID,
-		StartDate:  booking.StartDate,
-		EndDate:    booking.EndDate,
-		TotalCost:  booking.TotalCost,
-		Finished:   booking.Finished,
+		BookingID:       booking.BookingID,
+		CustomerID:      booking.CustomerID,
+		CarID:           booking.CarID,
+		DriverID:        booking.DriverID,
+		BookingTypeID:   booking.BookingTypeID,
+		StartDate:       booking.StartDate,
+		EndDate:         booking.EndDate,
+		TotalCost:       booking.TotalCost,
+		Finished:        booking.Finished,
+		Discount:        booking.Discount,
+		TotalDriverCost: booking.TotalDriverCost,
 	}
 }
 
@@ -103,4 +107,22 @@ func ToDriverResponses(drivers *[]models.Driver) *[]dto.DriverResponse {
 		driverResponses = append(driverResponses, *ToDriverResponse(&val))
 	}
 	return &driverResponses
+}
+
+func ToDriverIncentiveResponse(driverIncentive *models.DriverIncentive) *dto.DriverIncentiveResponse {
+	return &dto.DriverIncentiveResponse{
+		DriverIncentiveID: driverIncentive.DriverIncentiveID,
+		BookingID:         driverIncentive.BookingID,
+		Incentive:         driverIncentive.Incentive,
+	}
+}
+
+func ToDriverIncentiveResponses(driverIncentives *[]models.DriverIncentive) *[]dto.DriverIncentiveResponse {
+
+	var driverIncentiveResponses []dto.DriverIncentiveResponse
+
+	for _, val := range *driverIncentives {
+		driverIncentiveResponses = append(driverIncentiveResponses, *ToDriverIncentiveResponse(&val))
+	}
+	return &driverIncentiveResponses
 }

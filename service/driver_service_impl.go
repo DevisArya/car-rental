@@ -100,19 +100,41 @@ func (service *DriverServiceImpl) Update(ctx context.Context, request *dto.Drive
 	}
 
 	// cek apakah driver dengan id ini ada
-	_, err := service.DriverRepository.FindById(ctx, tx, custData.DriverID)
+	driver, err := service.DriverRepository.FindById(ctx, tx, custData.DriverID)
 	if err != nil {
 		return err
 	}
 
-	//cek apakah data nik dan nomor hp sudah ada
-	noRecord, err := service.DriverRepository.FindByNikAndPhoneNumber(ctx, tx, custData.PhoneNumber, custData.Nik)
-	if err != nil {
-		return err
+	//jika nik tidak sama dengan sebelumnya
+	if driver.Nik != request.Nik {
+		custData.Nik = request.Nik
+
+		//cek apakah tidak ada nik
+		noRecord, err := service.DriverRepository.FindByNik(ctx, tx, request.Nik)
+		if err != nil {
+			return err
+		}
+
+		//jika ada
+		if !noRecord {
+			return helper.NewValidationError(http.StatusBadRequest, []string{"nik already used"})
+		}
 	}
 
-	if !noRecord {
-		return helper.NewValidationError(http.StatusBadRequest, []string{"nik or phone number already used"})
+	//jika nomor hp tidak sama dengan sebelumnya
+	if driver.PhoneNumber != request.PhoneNumber {
+		custData.PhoneNumber = request.PhoneNumber
+
+		//cek apakah tidak ada nomor hp
+		noRecord, err := service.DriverRepository.FindByPhoneNumber(ctx, tx, request.PhoneNumber)
+		if err != nil {
+			return err
+		}
+
+		//jika ada
+		if !noRecord {
+			return helper.NewValidationError(http.StatusBadRequest, []string{"phone number already used"})
+		}
 	}
 
 	if err := service.DriverRepository.Update(ctx, tx, &custData); err != nil {

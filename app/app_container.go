@@ -21,6 +21,10 @@ func NewAppContainer(db *gorm.DB, validate *validator.Validate) *handler.AppHand
 	driverService := service.NewDriverService(driverRepository, db, validate)
 	driverHandler := handler.NewDriverHandler(driverService)
 
+	driverIncentiveRepository := repository.NewDriverIncentiveRepository()
+	driverIncentiveService := service.NewDriverIncentiveService(driverIncentiveRepository, db, validate)
+	driverIncentiveHandler := handler.NewDriverIncentiveHandler(driverIncentiveService)
+
 	customerRepository := repository.NewCustomerRepository()
 	customerService := service.NewCustomerService(customerRepository, membershipService, db, validate)
 	customerHandler := handler.NewCustomerHandler(customerService)
@@ -30,10 +34,11 @@ func NewAppContainer(db *gorm.DB, validate *validator.Validate) *handler.AppHand
 	bookingHandler := handler.NewBookingHandler(bookingService)
 
 	return &handler.AppHandler{
-		CustomerHandler:   customerHandler,
-		CarHandler:        carHandler,
-		BookingHandler:    bookingHandler,
-		MembershipHandler: membershipHandler,
-		DriverHandler:     driverHandler,
+		CustomerHandler:        customerHandler,
+		CarHandler:             carHandler,
+		BookingHandler:         bookingHandler,
+		MembershipHandler:      membershipHandler,
+		DriverHandler:          driverHandler,
+		DriverIncentiveHandler: driverIncentiveHandler,
 	}
 }
