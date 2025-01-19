@@ -7,10 +7,12 @@ import (
 
 func ToCustomerResponse(customer *models.Customer) *dto.CustomerResponse {
 	return &dto.CustomerResponse{
-		CustomerID:  customer.CustomerID,
-		Name:        customer.Name,
-		Nik:         customer.Nik,
-		PhoneNumber: customer.PhoneNumber,
+		CustomerID:   customer.CustomerID,
+		Name:         customer.Name,
+		Nik:          customer.Nik,
+		PhoneNumber:  customer.PhoneNumber,
+		MembershipID: customer.MembershipID,
+		Membership:   customer.Membership,
 	}
 }
 

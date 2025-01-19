@@ -109,3 +109,17 @@ func (*DriverRepositoryImpl) FindByNikAndPhoneNumber(ctx context.Context, db *go
 
 	return false, nil
 }
+
+// // FindById implements DriverRepository
+// func (*DriverRepositoryImpl) FindDriverIncentive(ctx context.Context, db *gorm.DB, driverId uint, date *dto.FindDriverIncentiveRequest) (*models.Driver, error) {
+// 	var driver models.Driver
+
+// 	if err := db.WithContext(ctx).
+// 		Preload("Bookings", "start_date BETWEEN ? AND ?", date.StartDate, date.EndDate).
+// 		First(&driver, driverId).
+// 		Error; err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &driver, nil
+// }
