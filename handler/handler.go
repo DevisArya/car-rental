@@ -6,4 +6,5 @@ type AppHandler struct {
 	BookingHandler
 	MembershipHandler
 	DriverHandler
+	DriverIncentiveHandler
 }

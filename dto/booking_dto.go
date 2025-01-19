@@ -22,5 +22,5 @@ type BookingResponse struct {
 	TotalCost       uint64    `json:"total_cost"`
 	Finished        bool      `json:"finished"`
 	Discount        int       `json:"discount"`
-	TotalDriverCost int       `json:"total_driver_count"`
+	TotalDriverCost int       `json:"total_driver_cost"`
 }

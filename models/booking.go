@@ -13,7 +13,7 @@ type Booking struct {
 	TotalCost       uint64    `gorm:"type:bigint" json:"total_cost"`
 	Finished        bool      `gorm:"default:false" json:"finished"`
 	Discount        int       `gorm:"type:int" json:"discount"`
-	TotalDriverCost int       `gorm:"type:int" json:"total_driver_count"`
+	TotalDriverCost int       `gorm:"type:int" json:"total_driver_cost"`
 
 	DriverIncentive DriverIncentive `gorm:"foreignKey:BookingID;references:BookingID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 

@@ -13,4 +13,5 @@ func NewRouter(e *echo.Echo, AppHandler *handler.AppHandler) {
 	RegisterBookingRoutes(e, AppHandler.BookingHandler)
 	RegisterMembershipRoutes(e, AppHandler.MembershipHandler)
 	RegisterDriverRoutes(e, AppHandler.DriverHandler)
+	RegisterDriverIncentiveRoutes(e, AppHandler.DriverIncentiveHandler)
 }

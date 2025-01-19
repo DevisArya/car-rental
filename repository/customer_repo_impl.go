@@ -111,3 +111,35 @@ func (*CustomerRepositoryImpl) FindByNikAndPhoneNumber(ctx context.Context, db *
 
 	return false, nil
 }
+func (*CustomerRepositoryImpl) FindByPhoneNumber(ctx context.Context, db *gorm.DB, PhoneNumber string) (bool, error) {
+	var customer models.Customer
+
+	err := db.WithContext(ctx).
+		Where("phone_number = ?", PhoneNumber).
+		First(&customer).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return true, nil
+		}
+		return false, err
+	}
+
+	return false, nil
+}
+func (*CustomerRepositoryImpl) FindByNik(ctx context.Context, db *gorm.DB, Nik string) (bool, error) {
+	var customer models.Customer
+
+	err := db.WithContext(ctx).
+		Where("nik = ?", Nik).
+		First(&customer).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return true, nil
+		}
+		return false, err
+	}
+
+	return false, nil
+}
