@@ -6,9 +6,14 @@ Project ini adalah aplikasi backend rent car yang dibuat dengan golang, Echo Fra
 
 ---
 
+## Api Doc
+
+API documentation untuk v1.0.0 [here](https://documenter.getpostman.com/view/20325566/2sAYQanC5D).
+API documentation untuk v2.0.0 [here](https://documenter.getpostman.com/view/20325566/2sAYQanC9W).
+
 ## Prasyarat
 
-Pastikan Anda telah menginstal:
+Pastikan telah menginstal berikut:
 
 - [Go](https://golang.org/dl/) versi minimal 1.19
 - [PostgreSQL](https://www.postgresql.org/download/)
